@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #1E1E1E;
+  height: 100%;
+}
+
+/* Стилизация выпадающего списка */
+select {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1em;
+}
+
+/* Стилизация опций в выпадающем списке */
+select option {
+  background-color: rgba(30, 30, 30, 0.95);
+  color: #F5F5F5;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Стилизация при наведении на опцию */
+select option:hover,
+select option:focus,
+select option:active,
+select option:checked {
+  background-color: #FF4D00 !important;
+  color: white;
+}
+
+/* Удаление стандартной обводки при фокусе */
+select:focus {
+  outline: none;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+/* Стилизация скроллбара для выпадающего списка */
+select::-webkit-scrollbar {
+  width: 8px;
+  background-color: rgba(30, 30, 30, 0.95);
+}
+
+select::-webkit-scrollbar-thumb {
+  background-color: #FF4D00;
+  border-radius: 4px;
+}
+
+select::-webkit-scrollbar-track {
+  background-color: rgba(43, 43, 43, 0.95);
+  border-radius: 4px;
+}
+
+/* Стилизация активного состояния опции */
+select option:checked {
+  background: linear-gradient(0deg, #FF4D00 0%, #FF4D00 100%);
+  color: white;
+}
+
+/* Добавляем полупрозрачный фон для выпадающего списка */
+select optgroup,
+select option {
+  background-color: rgba(30, 30, 30, 0.95);
+  backdrop-filter: blur(10px);
+}
+
+/* Добавляем тонкую подсветку при наведении */
+select option:hover {
+  box-shadow: inset 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+/* Кастомный скроллбар */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #FF4D00;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-track {
+  background-color: #2B2B2B;
+}
+
+/* Анимация выпадающего списка */
+ul {
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+      opacity: 0;
+      transform: translateY(-5px);
+  }
+  to {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}
+
+.search-icon {
+  transition: transform 0.3s ease-out;
+}
+
+.search-icon:hover {
+  transform: translateX(2px) translateY(-2px) rotate(-5deg);
+}
+

@@ -1,0 +1,28 @@
+{
+  "user": {
+    "id": "user1",
+    "rules": [
+      {
+        "id": "rule1",
+        "name": "Temperature Rule",
+        "description": "IF Current Temperature is > 30°C, THEN send an E-mail to admin@example.com",
+        "connectedDevices": ["QingPing", "Weather Station"],
+        "status": "active"
+      },
+      {
+        "id": "rule2",
+        "name": "Door Alert",
+        "description": "IF Door Sensor is = Opened, THEN trigger an alarm and send an E-mail to security@example.com",
+        "connectedDevices": ["Dragino2019", "Main Door Sensor"],
+        "status": "inactive"
+      },
+      {
+        "id": "rule3",
+        "name": "Humidity Alert",
+        "description": "IF Humidity Level is < 20%, THEN send a Notification to the monitoring team",
+        "connectedDevices": ["Humidity Sensor", "Weather Station"],
+        "status": "active"
+      }
+    ]
+  }
+}
