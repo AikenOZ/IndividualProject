@@ -18,8 +18,22 @@ const pageVariants = {
 };
 
 const pageTransition = {
-  duration: 0.4,
+  duration: 1, // Синхронизировано с index_rules
   ease: 'easeInOut',
+};
+
+const navbarVariants = {
+  initial: { y: -20, opacity: 0 },
+  animate: {
+    y: 0,
+    opacity: 1,
+    transition: { duration: 0.25, ease: 'easeOut' }
+  },
+  exit: {
+    y: -20,
+    opacity: 0,
+    transition: { duration: 0.3, ease: 'easeIn' }
+  }
 };
 
 const ChatMessage = ({ message }) => {
@@ -32,11 +46,10 @@ const ChatMessage = ({ message }) => {
 
   return (
     <motion.div
-      className={`my-3 px-6 py-3 rounded-2xl max-w-[70%] break-words leading-relaxed ${
-        isUser
-          ? 'bg-[#3A3A3A] self-end text-white text-right'
-          : 'bg-[#2B2B2B] self-start text-white text-left'
-      }`}
+      className={`my-3 px-6 py-3 rounded-2xl max-w-[70%] break-words leading-relaxed ${isUser
+        ? 'bg-gray-200 self-end text-gray-800 text-right shadow-sm'
+        : 'bg-white self-start text-gray-800 text-left shadow-sm border border-gray-100'
+        }`}
       variants={variants}
       initial="initial"
       animate="animate"
@@ -51,7 +64,7 @@ function Canvas() {
   const navigate = useNavigate();
   const navControls = useAnimation();
   const [isExiting, setIsExiting] = useState(false);
-  
+
   // Состояние ожидания ответа от AI
   const [awaitingAiResponse, setAwaitingAiResponse] = useState(false);
 
@@ -97,25 +110,25 @@ function Canvas() {
 
   const handleSendMessage = () => {
     if (inputValue.trim() === '' || awaitingAiResponse) return;
-    const newMessage = { 
-      id: Date.now(), 
-      sender: 'user', 
-      text: inputValue 
+    const newMessage = {
+      id: Date.now(),
+      sender: 'user',
+      text: inputValue
     };
     setMessages([...messages, newMessage]);
     setInputValue('');
-    
+
     // Устанавливаем флаг ожидания ответа AI
     setAwaitingAiResponse(true);
 
     setTimeout(() => {
-      const aiReply = { 
-        id: Date.now() + 1, 
-        sender: 'ai', 
-        text: 'Хорошо, я подготовлю для тебя программу. Один момент...' 
+      const aiReply = {
+        id: Date.now() + 1,
+        sender: 'ai',
+        text: 'Хорошо, я подготовлю для тебя программу. Один момент...'
       };
       setMessages(prev => [...prev, aiReply]);
-      
+
       // Ответ от AI получен, теперь можно отправлять новое сообщение
       setAwaitingAiResponse(false);
     }, 1000);
@@ -129,20 +142,20 @@ function Canvas() {
           width: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-          background: #2B2B2B;
+          background: #f3f4f6;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #FF4D00;
+          background: #9333ea;
           border-radius: 3px;
         }
         .custom-scrollbar {
           scrollbar-width: thin;
-          scrollbar-color: #FF4D00 #2B2B2B;
+          scrollbar-color: #9333ea #f3f4f6;
         }
       `}</style>
       <AnimatePresence mode="wait">
         <motion.div
-          className="bg-[#1E1E1E] h-screen font-sans flex flex-col"
+          className="bg-gray-50 h-screen font-sans flex flex-col"
           variants={pageVariants}
           initial="initial"
           animate={isExiting ? "exit" : "animate"}
@@ -150,28 +163,29 @@ function Canvas() {
           transition={pageTransition}
           onAnimationComplete={() => isExiting && navigate('/')}
         >
-          {/* Навигационная панель */}
           <motion.div
-            className="border-b border-white/30"
-            initial={{ y: -20, opacity: 0 }}
-            animate={navControls}
+            className="border-b border-gray-200"
+            variants={navbarVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
           >
             <div className="py-6 flex justify-between items-center px-6">
               <motion.button
                 onClick={handleBackClick}
-                className="flex items-center gap-4 text-[#F5F5F5] text-xl font-light tracking-wide"
+                className="flex items-center gap-4 text-gray-800 text-xl font-light tracking-wide"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <span className="text-[#F5F5F5] text-xl">←</span>
+                <span className="text-gray-800 text-xl">←</span>
                 <span>Назад</span>
               </motion.button>
               <motion.button
-                className="bg-[#FF4D00] text-white px-6 py-2.5 rounded-lg text-[15px] font-medium"
+                className="bg-purple-600 text-white px-6 py-2.5 rounded-lg text-[15px] font-medium hover:bg-purple-700 transition-colors"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Сохранить
+                Скачать чат
               </motion.button>
             </div>
           </motion.div>
@@ -186,11 +200,11 @@ function Canvas() {
           </div>
 
           {/* Поле ввода снизу */}
-          <div className="py-4 w-full px-6">
+          <div className="py-4 w-full px-6 bg-white border-t border-gray-100">
             <div className="max-w-3xl mx-auto w-full">
-              <div className="flex items-center gap-2 bg-[#2B2B2B] rounded-2xl px-4 py-2">
+              <div className="flex items-center gap-2 bg-gray-50 rounded-2xl px-4 py-2">
                 <input
-                  className="flex-grow p-2 rounded-xl bg-[#2B2B2B] text-white focus:outline-none placeholder-gray-400"
+                  className="flex-grow p-2 rounded-xl bg-gray-50 text-gray-800 focus:outline-none placeholder-gray-400"
                   placeholder="Напишите сообщение..."
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
@@ -198,11 +212,10 @@ function Canvas() {
                   disabled={awaitingAiResponse} // блокируем ввод, пока ждем ответ
                 />
                 <motion.button
-                  className={`px-4 py-2 rounded-xl transition-all duration-300 ${
-                    awaitingAiResponse || inputValue.trim() === ''
-                      ? 'bg-[#2B2B2B] text-gray-500 cursor-not-allowed'
-                      : 'bg-[#FF4D00] text-white hover:scale-105'
-                  }`}
+                  className={`px-4 py-2 rounded-xl transition-all duration-300 ${awaitingAiResponse || inputValue.trim() === ''
+                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    : 'bg-purple-600 text-white hover:bg-purple-700'
+                    }`}
                   whileHover={!(awaitingAiResponse || inputValue.trim() === '') ? { scale: 1.05 } : {}}
                   whileTap={!(awaitingAiResponse || inputValue.trim() === '') ? { scale: 0.95 } : {}}
                   onClick={handleSendMessage}

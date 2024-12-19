@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import './DeviceModal.css'; // Ваши стили и анимации Tailwind
+import { useNavigate } from 'react-router-dom';
+import './DeviceModal.css';
+import { useWorkout } from '../WorkoutContext';
 
 const CATEGORIES = {
   upper: {
@@ -37,11 +39,13 @@ const CATEGORIES = {
   }
 };
 
-const DeviceModal = ({ isOpen, onClose, onSubmit }) => {
+const DeviceModal = ({ isOpen, onClose }) => {
+  const { updateMuscles } = useWorkout();
   const [isVisible, setIsVisible] = useState(false);
   const [selectedMuscles, setSelectedMuscles] = useState([]);
-  const [highlightedMuscle, setHighlightedMuscle] = useState(null);
   const [currentCategory, setCurrentCategory] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const [allSelected, setAllSelected] = useState({
     upper: [],
@@ -58,28 +62,30 @@ const DeviceModal = ({ isOpen, onClose, onSubmit }) => {
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
+      checkAuth();
     } else {
       setTimeout(() => setIsVisible(false), 300);
-      setSelectedMuscles([]);
-      setCurrentCategory(null);
-      setAllSelected({ upper: [], core: [], lower: [] });
-      setCompletedCategories({ upper: false, core: false, lower: false });
+      resetState();
     }
   }, [isOpen]);
 
-  useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.key === 'Escape') {
-        handleClose();
-      }
-    };
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
+  const checkAuth = () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/auth/signin');
+      return false;
     }
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, [isOpen]);
+    return true;
+  };
+
+  const resetState = () => {
+    setSelectedMuscles([]);
+    setCurrentCategory(null);
+    setAllSelected({ upper: [], core: [], lower: [] });
+    setCompletedCategories({ upper: false, core: false, lower: false });
+    setError(null);
+    setIsLoading(false);
+  };
 
   const handleClose = () => {
     const modal = document.querySelector('.modal-content');
@@ -98,115 +104,57 @@ const DeviceModal = ({ isOpen, onClose, onSubmit }) => {
   };
 
   const toggleMuscleSelection = (muscle) => {
-    setSelectedMuscles(prevSelected => {
-      const exists = prevSelected.find(m => m.id === muscle.id);
+    if (isLoading) return;
+
+    setSelectedMuscles(prev => {
+      const exists = prev.find(m => m.id === muscle.id);
       if (exists) {
-        return prevSelected.filter(m => m.id !== muscle.id);
-      } else {
-        return [...prevSelected, muscle];
+        return prev.filter(m => m.id !== muscle.id);
       }
+      return [...prev, muscle];
     });
   };
 
   const handleSaveCategory = () => {
-    if (currentCategory) {
-      setAllSelected(prev => ({ ...prev, [currentCategory]: selectedMuscles }));
-      setCompletedCategories(prev => ({ ...prev, [currentCategory]: selectedMuscles.length > 0 }));
-    }
+    if (!currentCategory || isLoading) return;
+
+    setAllSelected(prev => ({ ...prev, [currentCategory]: selectedMuscles }));
+    setCompletedCategories(prev => ({ ...prev, [currentCategory]: selectedMuscles.length > 0 }));
     setCurrentCategory(null);
     setSelectedMuscles([]);
   };
 
-  const handleFinalSubmit = () => {
-    const allMusclesSelected = {
-      upper: allSelected.upper,
-      core: allSelected.core,
-      lower: allSelected.lower
-    };
-    onSubmit(allMusclesSelected);
-    handleClose();
+  const handleFinalSubmit = async () => {
+    if (!checkAuth()) return;
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const result = await updateMuscles(allSelected);
+
+      if (result.status === 'success') {
+        // Просто закрываем модальное окно
+        handleClose();
+      } else {
+        console.error('Error response:', result);
+        setError(result.message || 'Произошла ошибка при сохранении');
+      }
+    } catch (error) {
+      console.error('Error in handleFinalSubmit:', error);
+      setError('Произошла ошибка при сохранении данных');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const isAnyCategoryCompleted = Object.values(completedCategories).some(v => v);
-
-  const renderCategorySelection = () => (
-    <div className="animate-fadeInScale mt-2 px-4 py-4 space-y-3">
-      {Object.entries(CATEGORIES).map(([catKey, catData]) => (
-        <button
-          key={catKey}
-          onClick={() => {
-            setCurrentCategory(catKey);
-            setSelectedMuscles(allSelected[catKey] || []);
-          }}
-          className={`px-4 py-3 text-white font-medium bg-[#2B2B2B] rounded-lg hover:bg-[#323232] transition-all duration-300 w-full text-left ${completedCategories[catKey] ? 'ring-2 ring-[#FF4D00]' : ''
-            }`}
-        >
-          {catData.title} {completedCategories[catKey] && '✓'}
-        </button>
-      ))}
-    </div>
-  );
-
-  const renderMuscleButtons = (muscles) => {
-    return muscles.map((muscle, index) => (
-      <button
-        key={muscle.id}
-        onClick={() => toggleMuscleSelection(muscle)}
-        onMouseEnter={() => setHighlightedMuscle(muscle.id)}
-        onMouseLeave={() => setHighlightedMuscle(null)}
-        className={`group w-full p-4 rounded-lg bg-[#2B2B2B] border border-[#3A3A3A] transition-all duration-300 transform hover:-translate-y-1 hover:bg-[#323232] ${selectedMuscles.find(m => m.id === muscle.id)
-            ? 'ring-2 ring-[#FF4D00] shadow-lg shadow-[#FF4D00]/20'
-            : ''
-          }`}
-        style={{ '--delay': `${0.3 + index * 0.05}s` }}
-      >
-        <div className="text-left transition-colors duration-300 max-w-full">
-          <p className={`text-base font-medium transition-colors duration-300 ${selectedMuscles.find(m => m.id === muscle.id)
-              ? 'text-[#FF4D00]'
-              : 'text-white group-hover:text-[#FF4D00]'
-            }`}>
-            {muscle.name}
-          </p>
-          <p className={`text-sm transition-colors duration-300 mt-1 ${selectedMuscles.find(m => m.id === muscle.id)
-              ? 'text-white'
-              : 'text-gray-400 group-hover:text-white'
-            }`}>
-            {muscle.description}
-          </p>
-        </div>
-      </button>
-    ));
-  };
-
-  const renderMuscleSelection = () => {
-    const categoryData = CATEGORIES[currentCategory];
-    return (
-      <div className="animate-fadeInScale">
-        <div className="flex items-center justify-between mb-4">
-          <button
-            onClick={() => {
-              setCurrentCategory(null);
-              setSelectedMuscles([]);
-            }}
-            className="text-gray-400 hover:text-white transition-colors duration-300"
-          >
-            ← Назад
-          </button>
-          <h3 className="text-gray-300 text-lg font-semibold">{categoryData.title}</h3>
-          <div className="w-10" />
-        </div>
-        <div className="overflow-y-auto max-h-64 px-4 py-4 space-y-3">
-          {renderMuscleButtons(categoryData.muscles)}
-        </div>
-      </div>
-    );
-  };
 
   if (!isOpen && !isVisible) return null;
 
   return (
     <div
-      className={`fixed inset-0 flex items-center justify-center transition-all duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'
+      className={`fixed inset-0 flex items-center justify-center z-50 transition-all duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'
         }`}
       style={{
         backgroundColor: 'rgba(0, 0, 0, 0.75)',
@@ -217,7 +165,7 @@ const DeviceModal = ({ isOpen, onClose, onSubmit }) => {
       <div
         className={`modal-content bg-[#1C1C1C] rounded-xl w-[450px] max-h-[70vh] transform transition-all duration-300 ${isOpen ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-4 opacity-0 scale-95'
           } p-5 flex flex-col`}
-        onClick={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
       >
         <div className="flex-grow overflow-auto">
           <div className="space-y-2 flex-shrink-0 mb-4 text-center animate-fadeIn">
@@ -226,51 +174,109 @@ const DeviceModal = ({ isOpen, onClose, onSubmit }) => {
               Выберите категорию, затем мышечные группы
             </p>
           </div>
-          {!currentCategory && renderCategorySelection()}
-          {currentCategory && renderMuscleSelection()}
+
+          {error && (
+            <div className="mb-4 p-4 bg-red-500/10 border-l-4 border-red-500 text-red-500">
+              {error}
+            </div>
+          )}
+
+          {!currentCategory ? (
+            <div className="animate-fadeInScale mt-2 px-4 py-4 space-y-3">
+              {Object.entries(CATEGORIES).map(([catKey, catData]) => (
+                <button
+                  key={catKey}
+                  onClick={() => {
+                    setCurrentCategory(catKey);
+                    setSelectedMuscles(allSelected[catKey] || []);
+                  }}
+                  disabled={isLoading}
+                  className={`px-4 py-3 text-white font-medium bg-[#2B2B2B] rounded-lg hover:bg-[#323232] transition-all duration-300 w-full text-left ${completedCategories[catKey] ? 'ring-2 ring-purple-600' : ''
+                    } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  {catData.title} {completedCategories[catKey] && '✓'}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="animate-fadeInScale">
+              <div className="flex items-center justify-between mb-4">
+                <button
+                  onClick={() => {
+                    setCurrentCategory(null);
+                    setSelectedMuscles([]);
+                  }}
+                  disabled={isLoading}
+                  className="text-gray-400 hover:text-white transition-colors duration-300"
+                >
+                  ← Назад
+                </button>
+                <h3 className="text-gray-300 text-lg font-semibold">
+                  {CATEGORIES[currentCategory].title}
+                </h3>
+                <div className="w-10" />
+              </div>
+
+              <div className="overflow-y-auto max-h-64 px-4 py-4 space-y-3">
+                {CATEGORIES[currentCategory].muscles.map((muscle) => (
+                  <button
+                    key={muscle.id}
+                    onClick={() => toggleMuscleSelection(muscle)}
+                    disabled={isLoading}
+                    className={`group w-full p-4 rounded-lg bg-[#2B2B2B] border border-[#3A3A3A] transition-all duration-300 transform hover:-translate-y-1 hover:bg-[#323232] ${selectedMuscles.find(m => m.id === muscle.id)
+                      ? 'ring-2 ring-purple-600 shadow-lg shadow-purple-600/20'
+                      : ''
+                      } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    <div className="text-left transition-colors duration-300 max-w-full">
+                      <p className={`text-base font-medium transition-colors duration-300 ${selectedMuscles.find(m => m.id === muscle.id)
+                        ? 'text-purple-500'
+                        : 'text-white group-hover:text-purple-500'
+                        }`}>
+                        {muscle.name}
+                      </p>
+                      <p className={`text-sm transition-colors duration-300 mt-1 ${selectedMuscles.find(m => m.id === muscle.id)
+                        ? 'text-white'
+                        : 'text-gray-400 group-hover:text-white'
+                        }`}>
+                        {muscle.description}
+                      </p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="flex-shrink-0 border-t border-[#2B2B2B] pt-4 flex justify-between mt-4">
           <button
             onClick={handleClose}
-            className="px-8 py-4 text-gray-400 text-base font-medium bg-[#1C1C1C] rounded-lg transition-all duration-300 hover:bg-[#2B2B2B] hover:text-white"
-            style={{
-              width: '45%',
-              fontSize: '16px',
-              padding: '16px',
-            }}
+            disabled={isLoading}
+            className={`px-8 py-4 text-gray-400 text-base font-medium bg-[#1C1C1C] rounded-lg transition-all duration-300 hover:bg-[#2B2B2B] hover:text-white ${isLoading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            style={{ width: '45%' }}
           >
             Закрыть
           </button>
           <button
-            onClick={
-              currentCategory
-                ? handleSaveCategory
-                : (isAnyCategoryCompleted ? handleFinalSubmit : undefined)
-            }
-            disabled={
-              currentCategory
-                ? selectedMuscles.length === 0
-                : !isAnyCategoryCompleted
-            }
-            className={`px-8 py-4 text-base font-medium rounded-lg transition-all duration-300 ${currentCategory
-                ? (selectedMuscles.length > 0
-                  ? 'text-white bg-[#FF4D00] hover:bg-[#FF6A00]'
-                  : 'text-gray-400 bg-[#2B2B2B] cursor-not-allowed')
-                : (isAnyCategoryCompleted
-                  ? 'text-white bg-[#FF4D00] hover:bg-[#FF6A00]'
-                  : 'text-gray-400 bg-[#2B2B2B] cursor-not-allowed')
+            onClick={currentCategory ? handleSaveCategory : handleFinalSubmit}
+            disabled={currentCategory ? selectedMuscles.length === 0 : !isAnyCategoryCompleted || isLoading}
+            className={`px-8 py-4 text-base font-medium rounded-lg transition-all duration-300 ${(currentCategory ? selectedMuscles.length > 0 : isAnyCategoryCompleted) && !isLoading
+              ? 'text-white bg-purple-600 hover:bg-purple-700'
+              : 'text-gray-400 bg-[#2B2B2B] cursor-not-allowed'
               }`}
-            style={{
-              width: '45%',
-              fontSize: '16px',
-              padding: '16px',
-            }}
+            style={{ width: '45%' }}
           >
-            {currentCategory ? 'Выбрать' : 'Далее'}
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : (
+              currentCategory ? 'Выбрать' : 'Далее'
+            )}
           </button>
         </div>
-
       </div>
     </div>
   );

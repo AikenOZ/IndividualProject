@@ -12,13 +12,6 @@ import LogicModal from '@/components/Modals/LogicModal';
 import deviceNotif from '@/assets/Device Notif.svg';
 import actionButton from '@/assets/actionbutton.svg';
 
-// Import constants
-import {
-  BOTTOM_BUTTON_CONTAINER_VARIANTS,
-  LEFT_BUTTON_VARIANTS,
-  RIGHT_BUTTON_VARIANTS,
-} from '@/utils/modalConstants';
-
 // Animation variants for center icons
 const centerIconVariants = {
   whileHover: {
@@ -96,7 +89,7 @@ function AddRule() {
   return (
     <AnimatePresence mode="wait">
       <motion.div 
-        className="bg-[#1E1E1E] min-h-screen font-sans"
+        className="bg-gray-50 min-h-screen font-sans"
         variants={pageVariants}
         initial="initial"
         animate={isExiting ? "exit" : "animate"}
@@ -112,15 +105,15 @@ function AddRule() {
           >
             <motion.button
               onClick={handleBackClick}
-              className="flex items-center gap-4 text-[#F5F5F5] text-2xl font-light tracking-wide"
+              className="flex items-center gap-4 text-gray-800 text-2xl font-light tracking-wide"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <span className="text-[#F5F5F5] text-xl">←</span>
+              <span className="text-gray-800 text-xl">←</span>
               <span>Новая тренировка</span>
             </motion.button>
             <motion.button
-              className="bg-[#FF4D00] text-white px-6 py-2.5 rounded-lg text-[15px] font-medium"
+              className="bg-purple-600 text-white px-6 py-2.5 rounded-lg text-[15px] font-medium hover:bg-purple-700 transition-colors"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setSaveRuleModalOpen(true)}
@@ -133,7 +126,7 @@ function AddRule() {
             style={{ 
               width: 'calc(100% - 75px)',
               height: '1px',
-              background: 'rgba(255, 255, 255, 0.5)'
+              background: 'rgba(0, 0, 0, 0.1)'
             }}
           />
         </div>
@@ -155,10 +148,10 @@ function AddRule() {
                   onLoad={handleImageLoad}
                 />
               </motion.div>
-              <h3 className="text-[#F5F5F5] text-lg font-semibold mb-2">
+              <h3 className="text-gray-800 text-lg font-semibold mb-2">
                 Выберите группы мышц
               </h3>
-              <p className="text-[#808080] text-sm font-light max-w-[280px] leading-relaxed">
+              <p className="text-gray-500 text-sm font-light max-w-[280px] leading-relaxed">
                 Выберите группы мышц, которые вы хотите тренировать, ИИ подберет план
               </p>
             </div>
@@ -178,57 +171,14 @@ function AddRule() {
                   onLoad={handleImageLoad}
                 />
               </motion.div>
-              <h3 className="text-[#F5F5F5] text-lg font-semibold mb-2">
+              <h3 className="text-gray-800 text-lg font-semibold mb-2">
                 Укажите ваши пропорции
               </h3>
-              <p className="text-[#808080] text-sm font-light max-w-[280px] leading-relaxed">
+              <p className="text-gray-500 text-sm font-light max-w-[280px] leading-relaxed">
                 Укажите пропорции вашего тела, это позволит подобрать наилучший план
               </p>
             </div>
           </div>
-
-          <motion.div
-            className="flex items-center justify-center w-full h-[80px] px-4"
-            style={{
-              position: 'fixed',
-              bottom: '20px',
-            }}
-            variants={BOTTOM_BUTTON_CONTAINER_VARIANTS}
-            initial="hidden"
-            animate={bottomButtonsControls}
-          >
-            <div className="flex items-center justify-between w-[120px]">
-              <motion.div
-                className="flex items-center justify-center w-[60px] h-[60px] cursor-pointer"
-                onClick={() => setDeviceModalOpen(true)}
-                variants={LEFT_BUTTON_VARIANTS}
-                whileHover="whileHover"
-                whileTap="whileTap"
-              >
-                <img
-                  src={deviceNotif}
-                  alt="Device Icon"
-                  className="w-[52px] h-[52px]"
-                  onLoad={handleImageLoad}
-                />
-              </motion.div>
-
-              <motion.div
-                className="flex items-center justify-center w-[60px] h-[60px] cursor-pointer"
-                onClick={() => setActionModalOpen(true)}
-                variants={RIGHT_BUTTON_VARIANTS}
-                whileHover="whileHover"
-                whileTap="whileTap"
-              >
-                <img
-                  src={actionButton}
-                  alt="Action Icon"
-                  className="w-[52px] h-[52px]"
-                  onLoad={handleImageLoad}
-                />
-              </motion.div>
-            </div>
-          </motion.div>
         </div>
 
         {/* Modal components */}

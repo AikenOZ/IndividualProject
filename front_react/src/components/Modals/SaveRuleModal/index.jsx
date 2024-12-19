@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { SAVE_RULE_PLACEHOLDERS, SAVE_RULE_LABELS, SAVE_RULE_BUTTONS } from '@/utils/saveRuleConstants';
 
 const SaveRuleModal = ({ isOpen, onClose }) => {
-  const navigate = useNavigate(); // Инициализация useNavigate
+  const navigate = useNavigate();
   const [ruleName, setRuleName] = useState('');
   const [ruleDescription, setRuleDescription] = useState('');
   const [isVisible, setIsVisible] = useState(false);
@@ -65,20 +65,20 @@ const SaveRuleModal = ({ isOpen, onClose }) => {
     }
   };
 
-  const handleSave = () => {
-    if (ruleName.trim()) {
-      saveRuleToJson();
-      navigate('/index-rules'); // Редирект на index_rules.jsx
-    } else {
-      alert('Please provide a rule name.');
+  const handleSave = async () => {
+    try {
+      await saveWorkout(ruleName, ruleDescription);
+      navigate('/index-rules');
+    } catch (error) {
+      console.error('Ошибка при сохранении тренировки:', error);
+      alert('Ошибка при сохранении тренировки');
     }
   };
 
   return (
     <div
-      className={`fixed inset-0 flex items-center justify-center transition-all duration-300 ${
-        isOpen ? 'opacity-100' : 'opacity-0'
-      }`}
+      className={`fixed inset-0 flex items-center justify-center transition-all duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'
+        }`}
       style={{
         backgroundColor: 'rgba(0, 0, 0, 0.75)',
         backdropFilter: 'blur(4px)',
@@ -86,9 +86,8 @@ const SaveRuleModal = ({ isOpen, onClose }) => {
       onClick={handleOverlayClick}
     >
       <div
-        className={`modal-content bg-[#1C1C1C] rounded-xl w-full max-w-md overflow-hidden transform transition-all duration-300 ${
-          isOpen ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-4 opacity-0 scale-95'
-        }`}
+        className={`modal-content bg-[#1C1C1C] rounded-xl w-full max-w-md overflow-hidden transform transition-all duration-300 ${isOpen ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-4 opacity-0 scale-95'
+          }`}
         onClick={(e) => e.stopPropagation()}
         style={{ '--delay': '0s' }}
       >
@@ -110,10 +109,10 @@ const SaveRuleModal = ({ isOpen, onClose }) => {
                 placeholder="Введите название тренировки"
                 value={ruleName}
                 onChange={(e) => setRuleName(e.target.value)}
-                className="w-full bg-[#2B2B2B] text-white px-4 py-3 rounded-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#FF4D00]"
+                className="w-full bg-[#2B2B2B] text-white px-4 py-3 rounded-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-600"
               />
             </div>
-            
+
             <div>
               <label className="block text-sm text-gray-400 mb-1">
                 Описание
@@ -122,7 +121,7 @@ const SaveRuleModal = ({ isOpen, onClose }) => {
                 placeholder="Введите описание тренировки"
                 value={ruleDescription}
                 onChange={(e) => setRuleDescription(e.target.value)}
-                className="w-full bg-[#2B2B2B] text-white px-4 py-3 rounded-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#FF4D00] h-32 resize-none"
+                className="w-full bg-[#2B2B2B] text-white px-4 py-3 rounded-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-600 h-32 resize-none"
               />
             </div>
           </div>
@@ -141,11 +140,10 @@ const SaveRuleModal = ({ isOpen, onClose }) => {
             </button>
             <button
               onClick={handleSave}
-              className={`px-8 py-4 text-base font-medium rounded-lg transition-all duration-300 ${
-                ruleName.trim()
-                  ? 'text-white bg-[#FF4D00] hover:bg-[#FF6A00]'
-                  : 'text-gray-400 bg-[#2B2B2B] cursor-not-allowed'
-              }`}
+              className={`px-8 py-4 text-base font-medium rounded-lg transition-all duration-300 ${ruleName.trim()
+                ? 'text-white bg-purple-600 hover:bg-purple-700'
+                : 'text-gray-400 bg-[#2B2B2B] cursor-not-allowed'
+                }`}
               style={{
                 width: '45%',
                 fontSize: '16px',

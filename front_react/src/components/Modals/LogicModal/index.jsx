@@ -31,7 +31,7 @@ const LogicModal = ({ isOpen, onClose }) => {
           <select
             value={conditionType}
             onChange={(e) => setConditionType(e.target.value)}
-            className="bg-[#3A3A3A] text-[#F5F5F5] px-4 py-2 rounded w-full mb-4 focus:outline-none focus:ring-2 focus:ring-[#FF4D00]"
+            className="bg-[#3A3A3A] text-[#F5F5F5] px-4 py-2 rounded w-full mb-4 focus:outline-none focus:ring-2 focus:ring-purple-600"
           >
             {LOGIC_OPERATORS.map(operator => (
               <option key={operator.value} value={operator.value}>
@@ -47,7 +47,7 @@ const LogicModal = ({ isOpen, onClose }) => {
             type="text"
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            className="w-full bg-[#3A3A3A] text-[#F5F5F5] px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-[#FF4D00]"
+            className="w-full bg-[#3A3A3A] text-[#F5F5F5] px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-purple-600"
             placeholder="Enter value..."
           />
         </div>
@@ -55,13 +55,13 @@ const LogicModal = ({ isOpen, onClose }) => {
         <div className="flex justify-between items-center mt-4">
           <button 
             onClick={onClose} 
-            className="bg-[#FF4D00] text-white px-6 py-2 rounded hover:bg-[#cc3d00] transition-colors"
+            className="bg-purple-600 text-white px-6 py-2 rounded hover:bg-purple-700 transition-colors"
           >
             {LOGIC_BUTTONS.CANCEL}
           </button>
           <button 
             onClick={handleSave} 
-            className="bg-[#FF6F00] text-white px-6 py-2 rounded hover:bg-[#cc5a00] transition-colors"
+            className="bg-purple-500 text-white px-6 py-2 rounded hover:bg-purple-600 transition-colors"
             disabled={!value.trim()}
           >
             {LOGIC_BUTTONS.SAVE}

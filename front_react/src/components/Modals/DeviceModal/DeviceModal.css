@@ -2,6 +2,24 @@
     transition: transform 0.3s ease-out;
 }
 
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: #1C1C1C;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #9333ea;  /* фиолетовый цвет скроллбара */
+  border-radius: 3px;
+}
+
+.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: #9333ea #1C1C1C;  /* для Firefox */
+}
+
 .search-block:hover {
     transform: translateY(-2px);
 }

@@ -2,18 +2,27 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\MetricsController;
+use App\Http\Controllers\API\MusclesController;
+use App\Http\Controllers\API\WorkoutController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
+// Маршруты аутентификации
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// Защищенные маршруты
+Route::middleware('auth:api')->group(function () { // Изменили sanctum на api
+    // Маршруты аутентификации
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/me', [AuthController::class, 'me']);
+    Route::post('/refresh', [AuthController::class, 'refresh']);
+    
+    // Маршруты для работы с данными
+    Route::post('/muscles', [MusclesController::class, 'store']);
+    Route::post('/metrics', [MetricsController::class, 'store']);
+    Route::post('/workouts', [WorkoutController::class, 'store']);
+    Route::get('/muscles', [MusclesController::class, 'index']);
+    Route::get('/metrics', [MetricsController::class, 'index']);
+    Route::get('/workouts', [WorkoutController::class, 'index']);
 });
