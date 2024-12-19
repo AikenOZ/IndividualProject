@@ -21,8 +21,10 @@ Route::middleware('auth:api')->group(function () { // Изменили sanctum �
     // Маршруты для работы с данными
     Route::post('/muscles', [MusclesController::class, 'store']);
     Route::post('/metrics', [MetricsController::class, 'store']);
+
     Route::post('/workouts', [WorkoutController::class, 'store']);
+    Route::get('/workouts', [WorkoutController::class, 'index']);
+
     Route::get('/muscles', [MusclesController::class, 'index']);
     Route::get('/metrics', [MetricsController::class, 'index']);
-    Route::get('/workouts', [WorkoutController::class, 'index']);
 });

@@ -67,11 +67,30 @@ const SaveRuleModal = ({ isOpen, onClose }) => {
 
   const handleSave = async () => {
     try {
-      await saveWorkout(ruleName, ruleDescription);
-      navigate('/index-rules');
+      const response = await fetch('http://127.0.0.1:8000/api/workouts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          name: ruleName,
+          description: ruleDescription
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        handleClose();
+        // Здесь можно добавить уведомление об успехе
+      } else {
+        throw new Error(data.message || 'Ошибка при сохранении тренировки');
+      }
     } catch (error) {
       console.error('Ошибка при сохранении тренировки:', error);
-      alert('Ошибка при сохранении тренировки');
+      // Здесь можно добавить уведомление об ошибке
     }
   };
 

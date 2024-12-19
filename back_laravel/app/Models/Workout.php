@@ -4,18 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class UserMetrics extends Model
+class Workout extends Model
 {
-    protected $table = 'user_metrics';
-    
     protected $fillable = [
         'user_id',
-        'category',
-        'metric_name',
-        'metric_value'
+        'name',
+        'description',
+        'muscules',
+        'status'
     ];
 
-    const UPDATED_AT = null;
+    protected $casts = [
+        'status' => 'boolean',
+        'muscules' => 'array'
+    ];
 
     public function user()
     {
