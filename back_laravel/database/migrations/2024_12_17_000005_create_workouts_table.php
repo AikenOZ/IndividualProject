@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->text('description')->nullable();
-            $table->string('muscules', 1000)->nullable();
+            $table->json('muscules')->nullable();
             $table->boolean('status')->default(true);
             $table->timestamps();
         });

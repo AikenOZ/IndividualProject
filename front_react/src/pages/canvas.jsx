@@ -18,7 +18,7 @@ const pageVariants = {
 };
 
 const pageTransition = {
-  duration: 1, // Синхронизировано с index_rules
+  duration: 1, // Синхронизировано с index
   ease: 'easeInOut',
 };
 
@@ -70,7 +70,7 @@ function Canvas() {
 
   const [messages, setMessages] = useState([
     { id: 1, sender: 'ai', text: 'Привет! Я твой персональный помощник. Расскажи, какие у тебя цели в тренировках?' },
-    { id: 2, sender: 'user', text: 'Привет! Хочу улучшить выносливость и сбросить вес.' },
+    { id: 2, sender: 'user', text: 'Привет! Хочу улучшить выносливость и накачать банки.' },
     { id: 3, sender: 'ai', text: 'Отлично! Я могу составить для тебя программу тренировок. Есть ли у тебя предпочтения по типу занятий? Например: бег, велосипед, силовые?' },
   ]);
 

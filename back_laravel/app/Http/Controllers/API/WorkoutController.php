@@ -30,7 +30,7 @@ class WorkoutController extends Controller
                 ], 401);
             }
 
-            // Валидация
+            // Валидация данных
             $request->validate([
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string'
@@ -80,11 +80,52 @@ class WorkoutController extends Controller
         }
     }
 
+    public function destroy($id)
+    {
+        try {
+            $user_id = Auth::id();
+
+            if (!$user_id) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Пользователь не авторизован'
+                ], 401);
+            }
+
+            $workout = Workout::where('id', $id)->where('user_id', $user_id)->first();
+
+            if (!$workout) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Тренировка не найдена или не принадлежит пользователю'
+                ], 404);
+            }
+
+            $workout->delete();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Тренировка успешно удалена'
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error('Error deleting workout:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Ошибка при удалении тренировки'
+            ], 500);
+        }
+    }
+
     public function index()
     {
         try {
             $user_id = Auth::id();
-            
+
             if (!$user_id) {
                 return response()->json([
                     'status' => 'error',

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SAVE_RULE_PLACEHOLDERS, SAVE_RULE_LABELS, SAVE_RULE_BUTTONS } from '@/utils/saveRuleConstants';
 
 const SaveRuleModal = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
@@ -48,23 +47,6 @@ const SaveRuleModal = ({ isOpen, onClose }) => {
     }
   };
 
-  const saveRuleToJson = () => {
-    const ruleData = {
-      name: ruleName,
-      description: ruleDescription,
-      createdAt: new Date().toISOString()
-    };
-
-    try {
-      const existingRules = JSON.parse(localStorage.getItem('rules')) || [];
-      existingRules.push(ruleData);
-      localStorage.setItem('rules', JSON.stringify(existingRules));
-    } catch (error) {
-      console.error('Error saving rule:', error);
-      alert('Failed to save rule');
-    }
-  };
-
   const handleSave = async () => {
     try {
       const response = await fetch('http://127.0.0.1:8000/api/workouts', {
@@ -84,7 +66,8 @@ const SaveRuleModal = ({ isOpen, onClose }) => {
 
       if (response.ok) {
         handleClose();
-        // Здесь можно добавить уведомление об успехе
+        // После успешного сохранения выполняем редирект на главную страницу
+        navigate('/');
       } else {
         throw new Error(data.message || 'Ошибка при сохранении тренировки');
       }
@@ -168,6 +151,7 @@ const SaveRuleModal = ({ isOpen, onClose }) => {
                 fontSize: '16px',
                 padding: '16px',
               }}
+              disabled={!ruleName.trim()} // запрещаем сохранить, если название пустое
             >
               Создать
             </button>

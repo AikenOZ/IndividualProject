@@ -3,7 +3,6 @@ import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { WorkoutProvider } from './components/Modals/WorkoutContext';
 import IndexPage from './pages';
-import IndexRulesPage from './pages/index_rules';
 import AddRule from './pages/add_rule';
 import Canvas from './pages/canvas';
 import SignInPage from './pages/auth/signin';

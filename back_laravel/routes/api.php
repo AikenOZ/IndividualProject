@@ -24,6 +24,8 @@ Route::middleware('auth:api')->group(function () { // Изменили sanctum �
 
     Route::post('/workouts', [WorkoutController::class, 'store']);
     Route::get('/workouts', [WorkoutController::class, 'index']);
+    Route::delete('/workouts/{id}', [WorkoutController::class, 'destroy']);
+
 
     Route::get('/muscles', [MusclesController::class, 'index']);
     Route::get('/metrics', [MetricsController::class, 'index']);
